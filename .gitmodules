@@ -1,0 +1,3 @@
+[submodule "HtmlAgilityPack.FormProcessor"]
+	path = HtmlAgilityPack.FormProcessor
+	url = https://github.com/muxa/HtmlAgilityPack.FormProcessor.git
