@@ -36,9 +36,13 @@ namespace HtmlAgilityPack
 		private int _remainderOffset;
 		private ParseState _state;
 		private Encoding _streamencoding;
-		internal string Text;
 
-		// public props
+	    /// <summary>
+	    /// Gets original document content (html)
+	    /// </summary>
+	    public string Text { get; internal set; }
+
+	    // public props
 
 		/// <summary>
 		/// Adds Debugging attributes to node. Default is false.

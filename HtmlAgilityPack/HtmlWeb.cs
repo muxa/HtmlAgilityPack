@@ -38,6 +38,12 @@ namespace HtmlAgilityPack
 		/// </summary>
 		public delegate bool PreRequestHandler(HttpWebRequest request);
 
+        /// <summary>
+        /// Represents the method that will handle the DocumentCreated event.
+        /// </summary>
+        /// <param name="doc"></param>
+	    public delegate void NewDocumentCreatedHandler(HtmlDocument doc);
+
 		#endregion
 
 		#region Fields
@@ -70,6 +76,10 @@ namespace HtmlAgilityPack
 		/// </summary>
 		public PreRequestHandler PreRequest;
 
+        /// <summary>
+        /// Occurs when new HTML document is created
+        /// </summary>
+        public NewDocumentCreatedHandler DocumentCreated;
 
 		#endregion
 
@@ -1109,13 +1119,11 @@ namespace HtmlAgilityPack
 			{
 				if (uri.Scheme == Uri.UriSchemeFile)
 				{
-					doc = new HtmlDocument();
-					doc.OptionAutoCloseOnEnd = false;
-					doc.OptionAutoCloseOnEnd = true;
-					if (OverrideEncoding != null)
-						doc.Load(url, OverrideEncoding);
-					else
-						doc.DetectEncodingAndLoad(url, _autoDetectEncoding);
+				    doc = CreateDocument();
+				    if (OverrideEncoding != null)
+				        doc.Load(url, OverrideEncoding);
+				    else
+				        doc.DetectEncodingAndLoad(url, _autoDetectEncoding);
 				}
 				else
 				{
@@ -1150,9 +1158,7 @@ namespace HtmlAgilityPack
 			{
 				if (uri.Scheme == Uri.UriSchemeFile)
 				{
-					doc = new HtmlDocument();
-					doc.OptionAutoCloseOnEnd = false;
-					doc.OptionAutoCloseOnEnd = true;
+				    doc = CreateDocument();
 					doc.DetectEncodingAndLoad(url, _autoDetectEncoding);
 				}
 				else
@@ -1473,9 +1479,7 @@ namespace HtmlAgilityPack
 
 		private HtmlDocument LoadUrl(Uri uri, string method, WebProxy proxy, NetworkCredential creds)
 		{
-			HtmlDocument doc = new HtmlDocument();
-			doc.OptionAutoCloseOnEnd = false;
-			doc.OptionFixNestedTags = true;
+		    HtmlDocument doc = CreateDocument();
 			_statusCode = Get(uri, method, null, doc, proxy, creds);
 			if (_statusCode == HttpStatusCode.NotModified)
 			{
@@ -1508,7 +1512,22 @@ namespace HtmlAgilityPack
 			doc.Save(file);
 		}
 
-		#endregion
+        protected virtual HtmlDocument CreateDocument(Action<HtmlDocument> optionSetter = null)
+        {
+            var doc = new HtmlDocument();
+            doc.OptionAutoCloseOnEnd = false;
+            doc.OptionFixNestedTags = true;
+
+            if (optionSetter != null)
+                optionSetter(doc);
+
+            if (DocumentCreated != null)
+                DocumentCreated(doc);
+
+            return doc;
+        }
+
+	    #endregion
 
 	}
     /// <summary>
