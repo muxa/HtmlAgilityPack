@@ -44,6 +44,12 @@ namespace HtmlAgilityPack
         /// <param name="doc"></param>
 	    public delegate void NewDocumentCreatedHandler(HtmlDocument doc);
 
+        /// <summary>
+        /// Represents the method that will handle the WebException event.
+        /// </summary>
+        /// <param name="ex"></param>
+        public delegate void WebExceptionHandler(WebException ex);
+
 		#endregion
 
 		#region Fields
@@ -75,6 +81,11 @@ namespace HtmlAgilityPack
 		/// Occurs before an HTTP request is executed.
 		/// </summary>
 		public PreRequestHandler PreRequest;
+
+        /// <summary>
+        /// Occurs when there's a web exception encoutered
+        /// </summary>
+        public WebExceptionHandler WebException;
 
         /// <summary>
         /// Occurs when new HTML document is created
@@ -1358,8 +1369,12 @@ namespace HtmlAgilityPack
 						}
 						return HttpStatusCode.NotModified;
 					}
+
 					throw;
 				}
+
+			    if (WebException != null)
+			        WebException(we);
 			}
 			catch (Exception)
 			{
